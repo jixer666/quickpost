@@ -16,6 +16,9 @@
 </template>
 
 <script>
+import { generatedAnonymousUser } from "@/api/app/anoymousUser.js";
+import {getAnonymousToken, setAnonymousToken} from '@/utils/auth'
+
 export default {
   name: "desktop",
   data() {
@@ -23,12 +26,24 @@ export default {
       isLogoActive: false,
     };
   },
+  mounted() {
+    this.getAnonymousUser();
+  },
   methods: {
+    getAnonymousUser() {
+      if (getAnonymousToken()) {
+        return
+      }
+      generatedAnonymousUser().then(res => {
+        setAnonymousToken(res.data.token);
+      });
+    },
     handleLogoClick() {
       this.isLogoActive = true;
       setTimeout(() => (this.isLogoActive = false), 500);
     },
-  }
+  },
+
 };
 </script>
 

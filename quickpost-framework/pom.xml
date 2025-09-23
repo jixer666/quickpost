@@ -59,11 +59,6 @@
             <artifactId>quickpost-system</artifactId>
         </dependency>
 
-        <!-- 系统模块-->
-        <dependency>
-            <groupId>com.abc</groupId>
-            <artifactId>quickpost-app</artifactId>
-        </dependency>
 
     </dependencies>
 

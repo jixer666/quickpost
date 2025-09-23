@@ -29,5 +29,9 @@
             <artifactId>quickpost-system</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.abc</groupId>
+            <artifactId>quickpost-framework</artifactId>
+        </dependency>
     </dependencies>
 </project>

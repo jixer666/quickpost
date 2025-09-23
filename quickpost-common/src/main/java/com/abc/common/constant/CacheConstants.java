@@ -80,4 +80,11 @@ public class CacheConstants
      * 包裹缓存
      */
     public static final String PACK_VALID_TIME_KEY = "pack_valid_time:";
+
+
+    /**
+     * 匿名缓存
+     */
+    public static final String ANONYMOUS_TEMP_ID = "anonymous_temp_id:";
+    public static final Integer ANONYMOUS_TEMP_ID_EXPIRE = 1;
 }

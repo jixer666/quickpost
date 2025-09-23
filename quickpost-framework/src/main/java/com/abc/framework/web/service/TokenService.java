@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
+
+import com.abc.common.core.domain.entity.SysUser;
+import com.abc.framework.web.domain.enums.TokenTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,10 +62,10 @@ public class TokenService
      * 
      * @return 用户信息
      */
-    public LoginUser getLoginUser(HttpServletRequest request)
+    public LoginUser getLoginUser(HttpServletRequest request, Boolean isAnonymous)
     {
         // 获取请求携带的令牌
-        String token = getToken(request);
+        String token = isAnonymous ? getAnonymousToken(request) : getToken(request);
         if (StringUtils.isNotEmpty(token))
         {
             try
@@ -111,7 +114,7 @@ public class TokenService
      * @param loginUser 用户信息
      * @return 令牌
      */
-    public String createToken(LoginUser loginUser)
+    public String createToken(LoginUser loginUser, Integer loginType)
     {
         String token = IdUtils.fastUUID();
         loginUser.setToken(token);
@@ -121,7 +124,19 @@ public class TokenService
         Map<String, Object> claims = new HashMap<>();
         claims.put(Constants.LOGIN_USER_KEY, token);
         claims.put(Constants.JWT_USERNAME, loginUser.getUsername());
+        claims.put(Constants.TOKEN_TYPE, loginType);
         return createToken(claims);
+    }
+
+
+    public String createAnonymousUserToken(Long anyUserId) {
+        LoginUser loginUser = new LoginUser();
+        loginUser.setUserId(anyUserId);
+        SysUser sysUser = new SysUser();
+        sysUser.setUserId(anyUserId);
+        sysUser.setUserName(Constants.ANONYMOUS);
+        loginUser.setUser(sysUser);
+        return createToken(loginUser, TokenTypeEnum.ANONYMOUS.getType());
     }
 
     /**
@@ -221,6 +236,16 @@ public class TokenService
         if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX))
         {
             token = token.replace(Constants.TOKEN_PREFIX, "");
+        }
+        return token;
+    }
+
+
+    private String getAnonymousToken(HttpServletRequest request) {
+        String token = request.getHeader(header);
+        if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.ANONYMOUS_TOKEN_PREFIX))
+        {
+            token = token.replace(Constants.ANONYMOUS_TOKEN_PREFIX, "");
         }
         return token;
     }

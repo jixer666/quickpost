@@ -67,6 +67,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.abc</groupId>
+            <artifactId>quickpost-app</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

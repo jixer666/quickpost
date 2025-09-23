@@ -1,29 +1,31 @@
 package com.abc.framework.security.filter;
 
-import java.io.IOException;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.abc.common.core.domain.model.LoginUser;
+import com.abc.common.utils.SecurityUtils;
+import com.abc.common.utils.StringUtils;
+import com.abc.framework.web.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import com.abc.common.core.domain.model.LoginUser;
-import com.abc.common.utils.SecurityUtils;
-import com.abc.common.utils.StringUtils;
-import com.abc.framework.web.service.TokenService;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
- * token过滤器 验证token有效性
+ * 匿名token过滤器 验证匿名token有效性
  * 
  * @author ruoyi
  */
 @Component
-public class JwtAuthenticationTokenFilter extends OncePerRequestFilter
+public class JwtAnonymousAuthenticationTokenFilter extends OncePerRequestFilter
 {
     @Autowired
     private TokenService tokenService;
@@ -32,7 +34,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException
     {
-        LoginUser loginUser = tokenService.getLoginUser(request, false);
+        LoginUser loginUser = tokenService.getLoginUser(request, true);
         if (StringUtils.isNotNull(loginUser) && StringUtils.isNull(SecurityUtils.getAuthentication()))
         {
             tokenService.verifyToken(loginUser);

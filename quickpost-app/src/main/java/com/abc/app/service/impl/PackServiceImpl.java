@@ -5,6 +5,8 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.abc.app.domain.dto.PackDTO;
 import com.abc.app.domain.enums.PackStatusEnum;
 import com.abc.app.domain.enums.PackValidTimeTypeEnum;
@@ -58,9 +60,17 @@ public class PackServiceImpl extends ServiceImpl<PackMapper, Pack> implements Pa
     @Override
     public PackVO selectPackByPackCodeWithUiParam(String code) {
         AssertUtil.isNotEmpty(code, "取件码不能为空");
+
         Pack pack = selectPackByPackCode(code);
+
         AssertUtil.isFalse(Objects.isNull(pack) || pack.isComplete(), "包裹不存在");
-        AssertUtil.isFalse(pack.isInValid(), "包裹已过期");
+
+        Boolean isValid = checkPackValid(pack.getPackId());
+        if (!isValid) {
+            updatePackStatus(pack.getPackId(), PackStatusEnum.INVALID.getStatus());
+        }
+        AssertUtil.isTrue(isValid, "包裹已过期");
+
         List<File> files = fileService.selectFileByFileIds(pack.getFileIds());
         updatePackStatus(pack.getPackId(), PackStatusEnum.COMPLETE.getStatus());
 
@@ -98,7 +108,7 @@ public class PackServiceImpl extends ServiceImpl<PackMapper, Pack> implements Pa
         packDTO.checkInsertParams();
         Pack pack = Pack.buildDefaultInsert(packDTO);
         buildPackCode(pack);
-        validPack(pack.getPackId(), pack.getValidTimeType());
+        validPack(pack);
 
         packMapper.insertPack(pack);
 
@@ -110,10 +120,23 @@ public class PackServiceImpl extends ServiceImpl<PackMapper, Pack> implements Pa
         pack.setCode(RandomUtil.randomNumbers(6));
     }
 
-    private void validPack(Long packId, Integer validTimeType) {
+    private void validPack(Pack pack) {
+        AssertUtil.isNotEmpty(pack, "包裹不能为空");
+        AssertUtil.isNotEmpty(pack.getPackId(), "包裹ID不能为空");
+        AssertUtil.isNotEmpty(pack.getValidTimeType(), "有效期不能为空");
+        RedisUtils.set(CacheConstants.PACK_VALID_TIME_KEY + pack.getPackId(),
+                pack,
+                PackValidTimeTypeEnum.getValueByType(pack.getValidTimeType()),
+                TimeUnit.HOURS);
+    }
+
+    private Boolean checkPackValid(Long packId) {
         AssertUtil.isNotEmpty(packId, "包裹ID不能为空");
-        AssertUtil.isNotEmpty(validTimeType, "有效期不能为空");
-        RedisUtils.expire(CacheConstants.PACK_VALID_TIME_KEY + packId, PackValidTimeTypeEnum.getValueByType(validTimeType), TimeUnit.HOURS);
+        String packStr = RedisUtils.get(CacheConstants.PACK_VALID_TIME_KEY + packId);
+        if (StrUtil.isBlank(packStr)) {
+            return false;
+        }
+        return true;
     }
 
     /**

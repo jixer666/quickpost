@@ -4,6 +4,7 @@ import com.abc.common.core.domain.model.LoginBody;
 import com.abc.common.core.domain.model.LoginUser;
 import com.abc.common.core.domain.model.VerificationCodeBody;
 import com.abc.common.utils.AssertUtil;
+import com.abc.framework.web.domain.enums.TokenTypeEnum;
 import com.abc.framework.web.factory.LoginFactory;
 import com.abc.framework.web.strategy.login.LoginStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class SysLoginService {
         loginStrategy.preCheck(loginBody);
         LoginUser loginUser = loginStrategy.authenticate(loginBody);
         recordLoginInfo(loginUser.getUserId());
-        return tokenService.createToken(loginUser);
+        return tokenService.createToken(loginUser, TokenTypeEnum.SYSTEM.getType());
     }
 
     public VerificationCodeBody sendVerificationCode(LoginBody loginBody) {

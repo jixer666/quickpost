@@ -104,6 +104,7 @@ public class Constants
      * 令牌前缀
      */
     public static final String TOKEN_PREFIX = "Bearer ";
+    public static final String TOKEN_TYPE = "token_type ";
 
     /**
      * 令牌前缀
@@ -187,4 +188,11 @@ public class Constants
      * 默认值
      */
     public static final Integer ZERO = 0;
+
+    /**
+     * 匿名用户默认名称
+     */
+    public static final String ANONYMOUS = "anonymous";
+    public static final String ANONYMOUS_TOKEN_PREFIX = "Bearer-Anonymous ";
+
 }

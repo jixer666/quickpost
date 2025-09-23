@@ -114,3 +114,8 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+quickpost:
+  whiteUrlList:
+    - /oss/download/**
+    - /app/anonymous/generate
