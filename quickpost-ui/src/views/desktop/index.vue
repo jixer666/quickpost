@@ -18,6 +18,17 @@
 <script>
 export default {
   name: "desktop",
+  data() {
+    return {
+      isLogoActive: false,
+    };
+  },
+  methods: {
+    handleLogoClick() {
+      this.isLogoActive = true;
+      setTimeout(() => (this.isLogoActive = false), 500);
+    },
+  }
 };
 </script>
 

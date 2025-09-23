@@ -21,16 +21,16 @@ public class PackFileIdsTypeHandler extends BaseTypeHandler<FileIdsArray> {
 
     @Override
     public FileIdsArray getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        return JSONUtil.toBean(rs.getString(columnName), FileIdsArray.class);
+        return new FileIdsArray(JSONUtil.toList(rs.getString(columnName), Long.class));
     }
 
     @Override
-    public FileIdsArray getNullableResult(ResultSet resultSet, int i) throws SQLException {
-        return JSONUtil.toBean(resultSet.getString(i), FileIdsArray.class);
+    public FileIdsArray getNullableResult(ResultSet rs, int i) throws SQLException {
+        return new FileIdsArray(JSONUtil.toList(rs.getString(i), Long.class));
     }
 
     @Override
     public FileIdsArray getNullableResult(CallableStatement callableStatement, int i) throws SQLException {
-        return JSONUtil.toBean(callableStatement.getString(i), FileIdsArray.class);
+        return new FileIdsArray(JSONUtil.toList(callableStatement.getString(i), Long.class));
     }
 }

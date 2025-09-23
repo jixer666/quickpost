@@ -61,4 +61,6 @@ public interface PackService extends IService<Pack> {
      * @return 结果
      */
     int deletePackByPackId(Long packId);
+
+    PackVO selectPackByPackCodeWithUiParam(String code);
 }

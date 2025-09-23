@@ -1,7 +1,9 @@
 package com.abc.system.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import cn.hutool.core.collection.CollUtil;
 import com.abc.common.utils.AssertUtil;
 import com.abc.common.utils.DateUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -105,5 +107,10 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements Fi
         File fileEntity = fileMapper.selectById(fileId);
         AssertUtil.isNotEmpty(fileEntity, "文件不存在");
         return fileEntity;
+    }
+
+    @Override
+    public List<File> selectFileByFileIds(List<Long> fileIds) {
+        return CollUtil.isEmpty(fileIds) ? new ArrayList<>() : fileMapper.selectBatchIds(fileIds);
     }
 }

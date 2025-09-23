@@ -1,16 +1,21 @@
 package com.abc.app.service.impl;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import cn.hutool.core.util.RandomUtil;
 import com.abc.app.domain.dto.PackDTO;
+import com.abc.app.domain.enums.PackStatusEnum;
 import com.abc.app.domain.enums.PackValidTimeTypeEnum;
 import com.abc.app.domain.vo.PackVO;
 import com.abc.common.constant.CacheConstants;
 import com.abc.common.utils.AssertUtil;
 import com.abc.common.utils.DateUtils;
 import com.abc.common.utils.RedisUtils;
+import com.abc.system.domain.entity.File;
+import com.abc.system.service.FileService;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +35,9 @@ public class PackServiceImpl extends ServiceImpl<PackMapper, Pack> implements Pa
     @Autowired
     private PackMapper packMapper;
 
+    @Autowired
+    private FileService fileService;
+
     /**
      * 查询包裹
      *
@@ -39,6 +47,33 @@ public class PackServiceImpl extends ServiceImpl<PackMapper, Pack> implements Pa
     @Override
     public Pack selectPackByPackId(Long packId) {
         return packMapper.selectPackByPackId(packId);
+    }
+
+    public Pack selectPackByPackCode(String code) {
+        AssertUtil.isNotEmpty(code, "取件码包裹ID不能为空");
+
+        return packMapper.selectPackByPackCode(code);
+    }
+
+    @Override
+    public PackVO selectPackByPackCodeWithUiParam(String code) {
+        AssertUtil.isNotEmpty(code, "取件码不能为空");
+        Pack pack = selectPackByPackCode(code);
+        AssertUtil.isFalse(Objects.isNull(pack) || pack.isComplete(), "包裹不存在");
+        AssertUtil.isFalse(pack.isInValid(), "包裹已过期");
+        List<File> files = fileService.selectFileByFileIds(pack.getFileIds());
+        updatePackStatus(pack.getPackId(), PackStatusEnum.COMPLETE.getStatus());
+
+        return PackVO.buildByPack(pack, files);
+    }
+
+    private void updatePackStatus(Long packId, Integer status) {
+        AssertUtil.isNotEmpty(packId, "包裹ID不能为空");
+        AssertUtil.isNotEmpty(status, "状态不能为空");
+
+        packMapper.update(null, new LambdaUpdateWrapper<Pack>()
+                                .eq(Pack::getPackId, packId)
+                                .set(Pack::getStatus, status));
     }
 
     /**
@@ -60,7 +95,7 @@ public class PackServiceImpl extends ServiceImpl<PackMapper, Pack> implements Pa
      */
     @Override
     public PackVO insertPack(PackDTO packDTO) {
-        checkInsertParams(packDTO);
+        packDTO.checkInsertParams();
         Pack pack = Pack.buildDefaultInsert(packDTO);
         buildPackCode(pack);
         validPack(pack.getPackId(), pack.getValidTimeType());
@@ -79,13 +114,6 @@ public class PackServiceImpl extends ServiceImpl<PackMapper, Pack> implements Pa
         AssertUtil.isNotEmpty(packId, "包裹ID不能为空");
         AssertUtil.isNotEmpty(validTimeType, "有效期不能为空");
         RedisUtils.expire(CacheConstants.PACK_VALID_TIME_KEY + packId, PackValidTimeTypeEnum.getValueByType(validTimeType), TimeUnit.HOURS);
-    }
-
-    private void checkInsertParams(PackDTO packDTO) {
-        AssertUtil.isNotEmpty(packDTO, "参数不能为空");
-        AssertUtil.isNotEmpty(packDTO.getFileIds(), "上传文件不能为空");
-        AssertUtil.isTrue(!packDTO.getFileIds().isEmpty(), "上传文件不能为空");
-        AssertUtil.isNotEmpty(packDTO.getValidTimeType(), "有效期类型不能为空");
     }
 
     /**

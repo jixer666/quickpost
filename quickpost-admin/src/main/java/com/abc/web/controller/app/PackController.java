@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.abc.app.domain.dto.PackDTO;
 import com.abc.app.domain.vo.PackVO;
 import com.abc.common.core.domain.ApiResult;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,6 +65,12 @@ public class PackController extends BaseController {
     @GetMapping(value = "/{packId}")
     public AjaxResult getInfo(@PathVariable("packId") Long packId) {
         return success(packService.selectPackByPackId(packId));
+    }
+
+    @ApiOperation("提取文件")
+    @GetMapping("/code/{code}")
+    public ApiResult<PackVO> getInfoByCode(@PathVariable("code") String code) {
+        return ApiResult.ok(packService.selectPackByPackCodeWithUiParam(code));
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.abc.framework.web.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import com.abc.common.utils.AssertUtil;
 import com.abc.framework.web.factory.OssFactory;
 import com.abc.framework.web.service.OssService;
@@ -21,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 /**
  * @Author: LiJunXi
@@ -38,9 +36,6 @@ public class OssServiceImpl implements OssService {
     @Value("${oss.type}")
     private Integer ossType;
 
-    @Value("${url.backend}")
-    private String backendUrl;
-
     @Override
     public FileVO uploadOss(FileUploadDTO req) {
         log.info("开始上传文件, MD5: {}", req.getFileMd5());
@@ -53,7 +48,7 @@ public class OssServiceImpl implements OssService {
         saveFile.setFilePath(ossFile.getFilePath());
         log.info("开始文件保存数据库，文件: {}", saveFile);
         fileService.save(saveFile);
-        String downloadUrl = FileUtil.getFileDownloadUrl(backendUrl, saveFile.getFileId());
+        String downloadUrl = FileUtil.getFileDownloadUrl(saveFile.getFileId());
         log.info("文件上传成功，文件下载链接: {}", downloadUrl);
         return FileVO.buildFileVO(saveFile, downloadUrl);
     }

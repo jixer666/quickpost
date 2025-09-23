@@ -58,4 +58,6 @@ public interface PackMapper extends BaseMapper<Pack> {
      * @return 结果
      */
     int deletePackByPackIds(Long[] packIds);
+
+    Pack selectPackByPackCode(String code);
 }

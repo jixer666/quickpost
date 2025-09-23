@@ -62,4 +62,6 @@ public interface FileService extends IService<File> {
     List<File> getByMd5(String fileMd5);
 
     File checkAndGet(Long fileId);
+
+    List<File> selectFileByFileIds(List<Long> fileIds);
 }

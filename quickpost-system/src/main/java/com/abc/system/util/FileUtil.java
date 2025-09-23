@@ -1,8 +1,9 @@
 package com.abc.system.util;
 
+import cn.hutool.extra.spring.SpringUtil;
 import com.j256.simplemagic.ContentInfo;
 import com.j256.simplemagic.ContentInfoUtil;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 
 import java.text.SimpleDateFormat;
@@ -68,7 +69,8 @@ public class FileUtil {
      * @param fileId
      * @return
      */
-    public static String getFileDownloadUrl(String backendUrl, Long fileId) {
-        return backendUrl + FILE_DOWNLOAD_URL + fileId;
+    public static String getFileDownloadUrl(Long fileId) {
+        Environment environment = SpringUtil.getBean(Environment.class);
+        return environment.getProperty("url.backend") + FILE_DOWNLOAD_URL + fileId;
     }
 }

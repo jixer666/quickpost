@@ -26,7 +26,7 @@
 
         <el-form-item prop="validTimeType">
           <el-select v-model="form.validTimeType" placeholder="有效期">
-            <el-option :label="item.value" :value="item.label" v-for="(item, index) in pack_valid_time_type" :key="index"/>
+            <el-option :label="item.label" :value="item.value" v-for="(item, index) in pack_valid_time_type" :key="index"/>
           </el-select>
         </el-form-item>
 
@@ -61,6 +61,7 @@ const { pack_valid_time_type } = proxy.useDict("pack_valid_time_type")
 <script>
 import FileUpload from "@/components/MyFileUpload";
 import {addPack} from "@/api/app/pack.js";
+import { ElNotification } from 'element-plus'
 
 export default {
   name: "desktop-store",
@@ -100,13 +101,36 @@ export default {
           validTimeType: this.form.validTimeType,
           fileIds:  fileList.map(file => file.fileId)
         }).then(res => {
-          this.$message.success("存放成功，取件码为：" + res.data.code);
+          ElNotification({
+            title: "文件存放成功",
+            dangerouslyUseHTMLString: true,
+            message: `取件码为：<strong>${res.data.code}</strong>`,
+            type: 'success',
+            duration: 2000,
+          })
           this.isSubmitting = false;
+          this.clearForm();
         }).catch(error => {
           this.isSubmitting = false;
         })
       })
     },
+    clearForm() {
+      this.form.validTimeType = null; // 清空有效期下拉选择
+      this.$refs.form.clearValidate(); // 清除表单校验提示（避免残留红色边框/错误信息）
+
+      const fileUploadRef = this.$refs.fileUploadRef;
+      if (fileUploadRef) {
+        fileUploadRef.fileList = [];
+
+        const elUploadRef = fileUploadRef.$refs.imageUpload;
+        if (elUploadRef && elUploadRef.clearFiles) {
+          elUploadRef.clearFiles(); // 清除所有上传相关的文件记录（包括未提交的临时文件）
+        }
+      }
+
+      this.isSubmitting = false;
+    }
   },
 };
 </script>

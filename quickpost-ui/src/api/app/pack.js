@@ -17,6 +17,13 @@ export function getPack(packId) {
   })
 }
 
+export function getPackByCode(packCode) {
+  return request({
+    url: '/app/pack/code/' + packCode,
+    method: 'get'
+  })
+}
+
 // 新增包裹
 export function addPack(data) {
   return request({

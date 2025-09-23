@@ -3,8 +3,10 @@ package com.abc.app.domain.entity;
 import cn.hutool.core.bean.BeanUtil;
 import com.abc.app.domain.dto.PackDTO;
 import com.abc.app.domain.entity.typehanlder.details.FileIdsArray;
+import com.abc.app.domain.enums.PackStatusEnum;
 import com.abc.common.core.domain.BaseCustomEntity;
 import com.abc.common.utils.IdUtils;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import com.abc.common.annotation.Excel;
 
@@ -15,6 +17,7 @@ import com.abc.common.annotation.Excel;
  * @date 2025-09-22
  */
 @Data
+@TableName("tb_pack")
 public class Pack extends BaseCustomEntity {
     private static final long serialVersionUID = 1L;
 
@@ -47,5 +50,13 @@ public class Pack extends BaseCustomEntity {
         insert.setCommonParams();
 
         return insert;
+    }
+
+    public boolean isInValid() {
+        return this.getStatus().equals(PackStatusEnum.INVALID.getStatus());
+    }
+
+    public boolean isComplete() {
+        return this.getStatus().equals(PackStatusEnum.COMPLETE.getStatus());
     }
 }

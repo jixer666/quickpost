@@ -41,6 +41,10 @@
         <include refid="selectPackVo"/>
         where pack_id = #{packId}
     </select>
+    <select id="selectPackByPackCode"  resultMap="PackResult">
+        <include refid="selectPackVo"/>
+        where code = #{code}
+    </select>
 
     <insert id="insertPack" parameterType="Pack">
         insert into tb_pack
