@@ -3,6 +3,7 @@ package com.abc.app.mapper;
 import java.util.List;
 import com.abc.app.domain.entity.Pack;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 包裹Mapper接口
@@ -59,5 +60,5 @@ public interface PackMapper extends BaseMapper<Pack> {
      */
     int deletePackByPackIds(Long[] packIds);
 
-    Pack selectPackByPackCode(String code);
+    Pack selectPackByPackCode(@Param("code") String code, @Param("status") Integer status);
 }

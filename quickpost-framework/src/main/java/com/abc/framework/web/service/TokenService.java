@@ -235,9 +235,9 @@ public class TokenService
         String token = request.getHeader(header);
         if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX))
         {
-            token = token.replace(Constants.TOKEN_PREFIX, "");
+            return token.replace(Constants.TOKEN_PREFIX, "");
         }
-        return token;
+        return null;
     }
 
 
@@ -245,9 +245,9 @@ public class TokenService
         String token = request.getHeader(header);
         if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.ANONYMOUS_TOKEN_PREFIX))
         {
-            token = token.replace(Constants.ANONYMOUS_TOKEN_PREFIX, "");
+            return token.replace(Constants.ANONYMOUS_TOKEN_PREFIX, "");
         }
-        return token;
+        return null;
     }
 
     private String getTokenKey(String uuid)

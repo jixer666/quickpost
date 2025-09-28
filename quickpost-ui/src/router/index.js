@@ -38,15 +38,15 @@ export const constantRoutes = [
     ],
   },
   {
-    path: "/login",
+    path: "/admin/login",
     component: () => import("@/views/login"),
     hidden: true,
   },
-  {
-    path: "/register",
-    component: () => import("@/views/register"),
-    hidden: true,
-  },
+  // {
+  //   path: "/admin/register",
+  //   component: () => import("@/views/register"),
+  //   hidden: true,
+  // },
   {
     path: "/:pathMatch(.*)*",
     component: () => import("@/views/error/404"),
@@ -60,10 +60,10 @@ export const constantRoutes = [
   {
     path: "",
     component: Layout,
-    redirect: "/index",
+    redirect: "/admin/index",
     children: [
       {
-        path: "/index",
+        path: "/admin/index",
         component: () => import("@/views/index"),
         name: "Index",
         meta: { title: "首页", icon: "dashboard", affix: true },

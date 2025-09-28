@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { generatedAnonymousUser } from "@/api/app/anoymousUser.js";
+import { generatedAnonymousUser } from "@/api/app/anonymousUser.js";
 import {getAnonymousToken, setAnonymousToken} from '@/utils/auth'
 
 export default {

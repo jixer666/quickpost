@@ -19,7 +19,6 @@ import java.util.Map;
  */
 @Data
 public class BaseCustomEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
 
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

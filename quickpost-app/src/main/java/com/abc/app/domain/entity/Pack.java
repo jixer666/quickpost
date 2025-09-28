@@ -6,6 +6,7 @@ import com.abc.app.domain.entity.typehanlder.details.FileIdsArray;
 import com.abc.app.domain.enums.PackStatusEnum;
 import com.abc.common.core.domain.BaseCustomEntity;
 import com.abc.common.utils.IdUtils;
+import com.abc.common.utils.SecurityUtils;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import com.abc.common.annotation.Excel;
@@ -45,18 +46,17 @@ public class Pack extends BaseCustomEntity {
     public static Pack buildDefaultInsert(PackDTO packDTO) {
         Pack insert = BeanUtil.copyProperties(packDTO, Pack.class);
         insert.setPackId(IdUtils.getId());
-        // todo
-        insert.setUserId(IdUtils.getId());
+        insert.setUserId(SecurityUtils.getUserId());
         insert.setCommonParams();
 
         return insert;
     }
 
     public boolean isInValid() {
-        return this.getStatus().equals(PackStatusEnum.INVALID.getStatus());
+        return PackStatusEnum.INVALID.getStatus().equals(this.getStatus());
     }
 
     public boolean isComplete() {
-        return this.getStatus().equals(PackStatusEnum.COMPLETE.getStatus());
+        return PackStatusEnum.COMPLETE.getStatus().equals(this.getStatus());
     }
 }

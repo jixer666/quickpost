@@ -51,7 +51,8 @@
 import { getToken } from "@/utils/auth"
 import { isExternal } from "@/utils/validate"
 import Sortable from 'sortablejs'
-import md5 from 'js-md5'  // 引入js-md5库
+import md5 from 'js-md5'
+import {getAnonymousToken} from "../../utils/auth";  // 引入js-md5库
 
 const props = defineProps({
   modelValue: [String, Object, Array],
@@ -104,7 +105,21 @@ const dialogImageUrl = ref("")
 const dialogVisible = ref(false)
 const baseUrl = import.meta.env.VITE_APP_BASE_API
 const uploadImgUrl = ref(import.meta.env.VITE_APP_BASE_API + props.action) // 上传的图片服务器地址
-const headers = ref({ Authorization: "Bearer " + getToken() })
+const getHeaders = () => {
+  const token = getAnonymousToken();
+  if (token) {
+    return {
+      Authorization: "Bearer-Anonymous " + token
+    }
+  }
+  token = getToken();
+  if (token) {
+    return {
+      Authorization: "Bearer " + token
+    }
+  }
+}
+const headers = ref(getHeaders())
 const fileList = ref([])
 const showTip = computed(
     () => props.isShowTip && (props.fileType || props.fileSize)

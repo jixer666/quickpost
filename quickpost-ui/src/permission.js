@@ -11,7 +11,7 @@ import usePermissionStore from '@/store/modules/permission'
 
 NProgress.configure({ showSpinner: false })
 
-const whiteList = ['/login', '/register', "/desktop/pickup", "/desktop/store"]
+const whiteList = ["/admin/login", "/desktop/pickup", "/desktop/store"]
 
 const isWhiteList = (path) => {
   return whiteList.some(pattern => isPathMatch(pattern, path))
@@ -22,7 +22,7 @@ router.beforeEach((to, from, next) => {
   if (getToken()) {
     to.meta.title && useSettingsStore().setTitle(to.meta.title)
     /* has token*/
-    if (to.path === '/login') {
+    if (to.path === '/admin/login') {
       next({ path: '/' })
       NProgress.done()
     } else if (isWhiteList(to.path)) {

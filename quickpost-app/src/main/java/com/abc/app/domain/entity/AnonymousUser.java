@@ -1,9 +1,14 @@
 package com.abc.app.domain.entity;
 
+import com.abc.common.core.domain.BaseCustomEntity;
+import com.abc.common.enums.StatusEnum;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import com.abc.common.annotation.Excel;
-import com.abc.common.core.domain.BaseEntity;
+import lombok.NoArgsConstructor;
 
 /**
  * 匿名用户对象 tb_anonymous_user
@@ -12,8 +17,11 @@ import com.abc.common.core.domain.BaseEntity;
  * @date 2025-09-23
  */
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @TableName("tb_anonymous_user")
-public class AnonymousUser extends BaseEntity {
+public class AnonymousUser extends BaseCustomEntity {
     private static final long serialVersionUID = 1L;
 
     /** 匿名用户ID */
@@ -23,9 +31,13 @@ public class AnonymousUser extends BaseEntity {
     @Excel(name = "IP地址")
     private String ip;
 
-    /** 状态 */
-    @Excel(name = "状态")
-    private Integer status;
+    public static AnonymousUser buildDefaultInsert(Long anyUserId, String ipAddr) {
+        AnonymousUser anonymousUser = AnonymousUser.builder()
+                .anyUserId(anyUserId)
+                .ip(ipAddr)
+                .build();
+        anonymousUser.setCommonParams();
 
-
+        return anonymousUser;
+    }
 }

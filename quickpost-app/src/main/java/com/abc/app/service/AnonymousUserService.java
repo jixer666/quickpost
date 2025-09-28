@@ -61,4 +61,6 @@ public interface AnonymousUserService extends IService<AnonymousUser> {
     int deleteAnonymousUserByAnyUserId(Long anyUserId);
 
     AnonymousUserVO generateAnonymousUser();
+
+    void saveAnonymousUserByAnyUserId(Long anyUserId);
 }

@@ -1,6 +1,7 @@
 package com.abc.app.service.impl;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import com.abc.app.domain.vo.AnonymousUserVO;
@@ -63,7 +64,8 @@ public class AnonymousUserServiceImpl extends ServiceImpl<AnonymousUserMapper, A
      */
     @Override
     public int insertAnonymousUser(AnonymousUser anonymousUser) {
-        anonymousUser.setCreateTime(DateUtils.getNowDate());
+        AssertUtil.isNotEmpty(anonymousUser, "匿名用户参数不能为空");
+
         return anonymousUserMapper.insertAnonymousUser(anonymousUser);
     }
 
@@ -108,5 +110,18 @@ public class AnonymousUserServiceImpl extends ServiceImpl<AnonymousUserMapper, A
         AssertUtil.isTrue(isSetAnonymousUser, "分配匿名出错");
 
         return AnonymousUserVO.buildAnonymousUserVO(anyUserId, tokenService.createAnonymousUserToken(anyUserId));
+    }
+
+    @Override
+    public void saveAnonymousUserByAnyUserId(Long anyUserId) {
+        AssertUtil.isNotEmpty(anyUserId, "匿名用户ID不能为空");
+        AnonymousUser anonymousUser = selectAnonymousUserByAnyUserId(anyUserId);
+        if (Objects.nonNull(anonymousUser)) {
+            return;
+        }
+
+        String ipAddr = RedisUtils.get(CacheConstants.ANONYMOUS_TEMP_ID + anyUserId, String.class);
+
+        insertAnonymousUser(AnonymousUser.buildDefaultInsert(anyUserId, ipAddr));
     }
 }

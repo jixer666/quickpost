@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.abc.app.domain.dto.PackDTO;
 import com.abc.app.domain.enums.PackStatusEnum;
 import com.abc.app.domain.enums.PackValidTimeTypeEnum;
 import com.abc.app.domain.vo.PackVO;
+import com.abc.app.service.AnonymousUserService;
+import com.abc.app.util.PackCodeUtil;
 import com.abc.common.constant.CacheConstants;
 import com.abc.common.utils.AssertUtil;
 import com.abc.common.utils.DateUtils;
@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import com.abc.app.mapper.PackMapper;
 import com.abc.app.domain.entity.Pack;
 import com.abc.app.service.PackService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 包裹Service业务层处理
@@ -40,6 +41,9 @@ public class PackServiceImpl extends ServiceImpl<PackMapper, Pack> implements Pa
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private AnonymousUserService anonymousUserService;
+
     /**
      * 查询包裹
      *
@@ -54,7 +58,7 @@ public class PackServiceImpl extends ServiceImpl<PackMapper, Pack> implements Pa
     public Pack selectPackByPackCode(String code) {
         AssertUtil.isNotEmpty(code, "取件码包裹ID不能为空");
 
-        return packMapper.selectPackByPackCode(code);
+        return packMapper.selectPackByPackCode(code, PackStatusEnum.WAIT.getStatus());
     }
 
     @Override
@@ -73,8 +77,14 @@ public class PackServiceImpl extends ServiceImpl<PackMapper, Pack> implements Pa
 
         List<File> files = fileService.selectFileByFileIds(pack.getFileIds());
         updatePackStatus(pack.getPackId(), PackStatusEnum.COMPLETE.getStatus());
+        validPackCodeAgain(pack.getCode());
 
         return PackVO.buildByPack(pack, files);
+    }
+
+    private void validPackCodeAgain(String code) {
+        AssertUtil.isNotEmpty(code, "取件码不能为空");
+        PackCodeUtil.setCode(code);
     }
 
     private void updatePackStatus(Long packId, Integer status) {
@@ -104,11 +114,13 @@ public class PackServiceImpl extends ServiceImpl<PackMapper, Pack> implements Pa
      * @return 结果
      */
     @Override
+    @Transactional
     public PackVO insertPack(PackDTO packDTO) {
         packDTO.checkInsertParams();
         Pack pack = Pack.buildDefaultInsert(packDTO);
         buildPackCode(pack);
         validPack(pack);
+        anonymousUserService.saveAnonymousUserByAnyUserId(pack.getUserId());
 
         packMapper.insertPack(pack);
 
@@ -117,7 +129,9 @@ public class PackServiceImpl extends ServiceImpl<PackMapper, Pack> implements Pa
 
     private void buildPackCode(Pack pack) {
         AssertUtil.isNotEmpty(pack, "包裹不能为空");
-        pack.setCode(RandomUtil.randomNumbers(6));
+        String packCode = PackCodeUtil.getCode();
+        AssertUtil.isNotEmpty(packCode, "当前系统存放包裹已上限，请稍后再试");
+        pack.setCode(packCode);
     }
 
     private void validPack(Pack pack) {

@@ -43,7 +43,7 @@
     </select>
     <select id="selectPackByPackCode"  resultMap="PackResult">
         <include refid="selectPackVo"/>
-        where code = #{code}
+        where code = #{code} and status = #{status}
     </select>
 
     <insert id="insertPack" parameterType="Pack">

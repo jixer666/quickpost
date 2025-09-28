@@ -52,7 +52,11 @@
             <div class="file-table">
                 <el-table :data="fileList" stripe style="width: 100%">
                     <el-table-column prop="filename" label="文件名"/>
-                    <el-table-column prop="totalSize" label="大小" width="150"/>
+                    <el-table-column prop="totalSize" label="大小" width="150">
+                        <template #default="scope">
+                            {{ formatFileSize(scope.row.totalSize) }}
+                        </template>
+                    </el-table-column>
                     <el-table-column label="操作" fixed="right" width="80">
                         <template #default="scope">
                             <el-button type="primary" size="small" @click="downloadFile(scope.row.downloadUrl)">
@@ -123,8 +127,20 @@
             },
             downloadFile(url) {
                 window.location.href = url;
+            },
+            // 在组件的methods中添加
+            formatFileSize(size) {
+                if (size === 0) return '0 B';
+                // 定义单位数组
+                const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+                // 计算单位索引
+                const index = Math.floor(Math.log(size) / Math.log(1024));
+                // 计算转换后的值并保留两位小数
+                const formattedSize = (size / Math.pow(1024, index)).toFixed(2);
+                // 返回格式化后的字符串
+                return `${formattedSize} ${units[index]}`;
             }
-        }
+        },
     };
 </script>
 
